@@ -1,0 +1,26 @@
+[package]
+name = "test-sql-cipher"
+version = "0.0.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "2.0.0-beta", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0-beta", features = [] }
+tauri-plugin-shell = "2.0.0-beta"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+libsqlite3-sys = { version = "*", features = ["bundled-sqlcipher"] }
+
+[dependencies.tauri-plugin-sql]
+features = ["sqlite"] # or "postgres", or "mysql"
+version = "2.0.0-beta"
+# alternatively with Git
+git = "https://github.com/eleroy/plugins-workspace"
+branch = "v2"
+
