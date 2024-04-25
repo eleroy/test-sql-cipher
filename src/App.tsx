@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import Database from "@tauri-apps/plugin-sql";
 let db = await Database.load('sqlite:mydatabase.db')
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
-
-  
+  const [names, setNames] = useState<any[]>([]);
+  const insertIntoDatabase = async (name: string) => {
+    return await db.execute("INSERT into users (name) VALUES ($1)", [name])
+  }
+  const getDatabaseContent = async (): Promise<{ id: number, name: string }[]> => {
+    return await db.select("SELECT * from users")
+  }
+  useEffect(() => {
+    getDatabaseContent().then((entries) => setNames([...entries.map(v => v.name)]))
+  }, [])
 
   return (
     <div className="container">
@@ -32,7 +38,7 @@ function App() {
         className="row"
         onSubmit={(e) => {
           e.preventDefault();
-          greet();
+          insertIntoDatabase(name).then(() => getDatabaseContent()).then((entries) => setNames([...entries.map(v => v.name)]))
         }}
       >
         <input
@@ -40,10 +46,16 @@ function App() {
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Enter a name..."
         />
-        <button type="submit">Greet</button>
+        <button type="submit">Add name to database</button>
       </form>
 
-      <p>{greetMsg}</p>
+      <ol>
+        {
+          names.map(v =>
+            <li>{v}</li>
+          )
+        }
+      </ol>
     </div>
   );
 }
